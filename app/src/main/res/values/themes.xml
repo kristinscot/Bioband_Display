@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+    This is the base theme for the entire application.
+    By setting the parent to a "Theme.AppCompat" variant, all activities
+    that extend AppCompatActivity will work correctly.
+    -->
+    <style name="Theme.BiobandDisplay" parent="Theme.AppCompat.Light.NoActionBar">
+        <!-- You can customize theme attributes here if needed in the future -->
+        <!--
+        <item name="colorPrimary">@color/your_primary_color</item>
+        <item name="colorPrimaryDark">@color/your_primary_dark_color</item>
+        <item name="colorAccent">@color/your_accent_color</item>
+        -->
+    </style>
+
+</resources>
