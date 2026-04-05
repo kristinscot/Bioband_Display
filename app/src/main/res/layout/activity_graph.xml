@@ -3,18 +3,92 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2C3E50"
-    android:orientation="vertical"
+    android:background="#F8F9FA"
     tools:context=".GraphActivity">
 
-    <!-- The Chart View -->
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/line_chart"
+    <!-- Scrollable container for stats to ensure they fit -->
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/back_button_emg" />
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
 
-    <!-- Back to Main Page Button -->
+        <LinearLayout
+            android:id="@+id/emg_stats_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- V(rms) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginBottom="32dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="V(rms)"
+                    android:textColor="#7F8C8D"
+                    android:textSize="18sp" />
+                <TextView
+                    android:id="@+id/vrms_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-- mV"
+                    android:textColor="#2C3E50"
+                    android:textSize="48sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- TDMF -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginBottom="32dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mean Frequency (TDMF)"
+                    android:textColor="#7F8C8D"
+                    android:textSize="18sp" />
+                <TextView
+                    android:id="@+id/tdmf_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-- Hz"
+                    android:textColor="#2C3E50"
+                    android:textSize="48sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Muscle Status -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Muscle Status"
+                    android:textColor="#7F8C8D"
+                    android:textSize="18sp" />
+                <TextView
+                    android:id="@+id/muscle_status_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Resting"
+                    android:textColor="#2C3E50"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+
     <Button
         android:id="@+id/back_button_emg"
         android:layout_width="wrap_content"
@@ -22,8 +96,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
+        android:backgroundTint="#BDC3C7"
+        android:textColor="#FFFFFF"
         android:text="Back to main page" />
 
 </RelativeLayout>
-
-
