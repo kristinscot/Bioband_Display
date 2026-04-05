@@ -3,18 +3,115 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2C3E50"
-    android:orientation="vertical"
+    android:background="#F8F9FA"
     tools:context=".PpgGraphActivity">
 
-    <!-- The Chart View -->
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/ppg_line_chart"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@+id/back_button_ppg" />
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
 
-    <!-- Back to Main Page Button -->
+        <LinearLayout
+            android:id="@+id/ppg_stats_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <!-- Heart Rate (BPM) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Heart Rate"
+                    android:textColor="#7F8C8D"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/heart_rate_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-- BPM"
+                    android:textColor="#7F8C8D"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- SpO2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SpO2"
+                    android:textColor="#7F8C8D"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/spo2_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-- %"
+                    android:textColor="#7F8C8D"
+                    android:textSize="40sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Arterial Stiffness -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:layout_marginBottom="24dp">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Arterial Stiffness"
+                    android:textColor="#7F8C8D"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/art_stiffness_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-- m/s"
+                    android:textColor="#7F8C8D"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Breathing Rate -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Breathing Rate"
+                    android:textColor="#7F8C8D"
+                    android:textSize="16sp" />
+                <TextView
+                    android:id="@+id/breathing_rate_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="-- BrPM"
+                    android:textColor="#7F8C8D"
+                    android:textSize="32sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
     <Button
         android:id="@+id/back_button_ppg"
         android:layout_width="wrap_content"
@@ -22,6 +119,8 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
+        android:backgroundTint="#BDC3C7"
+        android:textColor="#FFFFFF"
         android:text="Back to main page" />
 
 </RelativeLayout>
