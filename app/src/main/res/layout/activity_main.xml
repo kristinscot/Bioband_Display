@@ -1,93 +1,223 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2C3E50"
+    android:background="#F8F9FA"
     android:padding="16dp"
     tools:context=".MainActivity">
 
-    <!-- A TextView to show connection status -->
-    <TextView
-        android:id="@+id/status_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="Initializing..."
-        android:textColor="@android:color/white"
-        android:textSize="22sp" />
-
-    <!-- A container for our action buttons -->
+    <!-- Bottom Container: Holds both status and the horizontal scrollable button panel -->
     <LinearLayout
-        android:id="@+id/buttons_container"
-        android:layout_width="wrap_content"
+        android:id="@+id/bottom_panel"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/status_text"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="24dp"
+        android:layout_alignParentBottom="true"
         android:orientation="vertical"
-        android:visibility="gone"
-        tools:visibility="visible">
+        android:gravity="center_horizontal"
+        android:paddingBottom="16dp">
 
-        <!-- Top row of buttons -->
-        <LinearLayout
+        <!-- Status notification -->
+        <TextView
+            android:id="@+id/status_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="horizontal">
+            android:layout_marginBottom="24dp"
+            android:text="Initializing..."
+            android:textColor="#2C3E50"
+            android:textSize="20sp" />
 
-            <!-- Button to go to the EMG Data/Graph page -->
-            <Button
-                android:id="@+id/show_graph_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="EMG Data" />
-
-            <!-- NEW: Button to go to the PPG Data page -->
-            <Button
-                android:id="@+id/ppg_data_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="PPG Data" />
-        </LinearLayout>
-
-        <!-- Middle row of buttons -->
-        <LinearLayout
-            android:layout_width="wrap_content"
+        <!-- Horizontal Scrollable Button Panel -->
+        <HorizontalScrollView
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:scrollbars="none"
+            android:overScrollMode="never">
 
-            <!-- NEW: Sweat Data Button -->
-            <Button
-                android:id="@+id/sweat_data_button"
+            <LinearLayout
+                android:id="@+id/buttons_container"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Sweat Data" />
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:visibility="gone"
+                tools:visibility="visible">
 
-            <!-- NEW: Test Data Button -->
-            <Button
-                android:id="@+id/test_data_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:text="Test Data" />
-        </LinearLayout>
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/show_graph_button"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="EMG Data"
+                    android:textAllCaps="true"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="#BDC3C7"
+                    android:textColor="#000000"
+                    app:cornerRadius="100dp"/>
 
-        <!-- Bottom row -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/ppg_data_button"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="PPG Data"
+                    android:textAllCaps="false"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="#BDC3C7"
+                    android:textColor="#000000"
+                    app:cornerRadius="100dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/sweat_data_button"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="Sweat Data"
+                    android:textAllCaps="false"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="#BDC3C7"
+                    android:textColor="#000000"
+                    app:cornerRadius="100dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/real_time_button"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="Real Time"
+                    android:textAllCaps="false"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="#BDC3C7"
+                    android:textColor="#000000"
+                    app:cornerRadius="100dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/journal_button"
+                    style="@style/Widget.Material3.Button.TonalButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:paddingStart="24dp"
+                    android:paddingEnd="24dp"
+                    android:text="Journal"
+                    android:textAllCaps="false"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"
+                    android:backgroundTint="#BDC3C7"
+                    android:textColor="#000000"
+                    app:cornerRadius="100dp"/>
+
+            </LinearLayout>
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
         <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
+            android:layout_width="match_parent"
+            android:layout_height="551dp"
+            android:layout_weight="1"
+            android:orientation="vertical">
 
-            <!-- NEW: Journal Button -->
-            <Button
-                android:id="@+id/journal_button"
-                android:layout_width="wrap_content"
+            <TextView
+                android:id="@+id/textView5"
+                android:layout_width="match_parent"
+                android:layout_height="4dp"
+                android:layout_weight="1"
+                android:background="#F44336"
+                android:fontFamily="sans-serif-condensed"
+                android:text="  Insights"
+                android:textAllCaps="false"
+                android:textColor="#FFFFFF"
+                android:textSize="40sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView15"
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_weight="0.6"
+                android:text="Blood Oxygenation:"
+                android:textAlignment="viewStart"
+                android:textColor="#F44336"
+                android:textSize="24sp"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/textView18"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_weight="1"
+                android:text="During yesterdays workout, your Sp02 levels were within normal ranges for your age group and your heartrate recovered to resting shortly afterwards: keep it up! "
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="0.6"
+                android:text="EMG Activity:"
+                android:textColor="#F44336"
+                android:textSize="24sp"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="match_parent"
+                android:layout_height="13dp"
+                android:layout_weight="1"
+                android:text="Your past few workouts have had you reach moderate fatigue: they've been optimal for muscle growth!"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView"
+                android:layout_width="match_parent"
+                android:layout_height="7dp"
+                android:layout_weight=".6"
+                android:text="Sweat Content:"
+                android:textColor="#F44336"
+                android:textSize="24sp"
+                android:textStyle="bold|italic" />
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_weight="1"
+                android:text="Your cortisol levels have decreased since your last workout: your bicep is ready for some exercise!"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/textView14"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Journal" />
+                android:layout_weight="1" />
+
+            <TextView
+                android:id="@+id/textView17"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
         </LinearLayout>
 
     </LinearLayout>
