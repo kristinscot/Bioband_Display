@@ -3,16 +3,71 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#2C3E50"
-    android:orientation="vertical"
+    android:background="#F8F9FA"
     tools:context=".SweatGraphActivity">
 
-    <!-- The Chart View -->
-    <com.github.mikephil.charting.charts.LineChart
-        android:id="@+id/sweat_line_chart"
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/back_button_sweat" />
+        android:layout_above="@+id/back_button_sweat"
+        android:padding="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Graph 1 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="1. Different Rct from Nyquists"
+                android:textColor="#2C3E50"
+                android:textStyle="bold"
+                android:paddingTop="16dp"
+                android:paddingBottom="8dp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/sweat_chart_1"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@android:color/white" />
+
+            <!-- Graph 2 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="2. Nyquists of Different Concentrations"
+                android:textColor="#2C3E50"
+                android:textStyle="bold"
+                android:paddingTop="24dp"
+                android:paddingBottom="8dp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/sweat_chart_2"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@android:color/white" />
+
+            <!-- Graph 3 -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="3. High and Low Frequencies Cut Nyquists"
+                android:textColor="#2C3E50"
+                android:textStyle="bold"
+                android:paddingTop="24dp"
+                android:paddingBottom="8dp" />
+
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/sweat_chart_3"
+                android:layout_width="match_parent"
+                android:layout_height="300dp"
+                android:background="@android:color/white"
+                android:layout_marginBottom="16dp"/>
+
+        </LinearLayout>
+    </ScrollView>
 
     <!-- Back to Main Page Button -->
     <Button
@@ -22,7 +77,21 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_margin="16dp"
+        android:backgroundTint="#BDC3C7"
+        android:textColor="#FFFFFF"
         android:text="Back to main page" />
 
+    <!-- Loading Overlay -->
+    <RelativeLayout
+        android:id="@+id/loading_overlay_sweat"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#AAF8F9FA"
+        android:visibility="gone">
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
+    </RelativeLayout>
+
 </RelativeLayout>
-    
