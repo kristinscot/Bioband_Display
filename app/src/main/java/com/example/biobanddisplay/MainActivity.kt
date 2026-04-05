@@ -5,6 +5,7 @@ import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
+import android.bluetooth.le.ScanSettings
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -28,7 +29,6 @@ class MainActivity : AppCompatActivity(), ConnectionStateListener {
 
     private val TAG = "BLE_CONNECT_APP"
 
-    // Bluetooth setup
     private val bluetoothManager: BluetoothManager by lazy {
         getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     }
@@ -36,244 +36,159 @@ class MainActivity : AppCompatActivity(), ConnectionStateListener {
         bluetoothManager.adapter
     }
 
-    // App State
     private var isPythonReady = false
     private var isBleReady = false
     private var scanning = false
 
-    // UI and Threading
     private val handler = Handler(Looper.getMainLooper())
     private lateinit var statusText: TextView
-    private lateinit var showGraphButton: Button
-    private lateinit var ppgDataButton: Button
-    private lateinit var sweatDataButton: Button
-    private lateinit var testDataButton: Button // New button variable
-    private lateinit var journalButton: Button // New button variable
     private lateinit var buttonsContainer: View
 
-    // Constants
-    private val SCAN_PERIOD: Long = 15000
-    private val DEVICE_NAME = "Test Device" // <-- IMPORTANT: Make sure this name is correct
+    private val SCAN_PERIOD: Long = 30000 
+    private val DEVICE_NAME = "ADC_DONGLE" // Matches the updated firmware name
 
     private val requestPermissionLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            val allGranted = permissions.all { it.value }
-            if (allGranted) {
-                Log.d(TAG, "Permissions granted.")
+            if (permissions.all { it.value }) {
                 startAppInitialization()
             } else {
-                Toast.makeText(this, "Permissions are required for this app to function.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this, "Bluetooth & Location permissions are required.", Toast.LENGTH_LONG).show()
             }
         }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        Log.d(TAG, "onCreate: Activity starting.")
 
-        // --- Initialize UI ---
         statusText = findViewById(R.id.status_text)
-        showGraphButton = findViewById(R.id.show_graph_button)
-        ppgDataButton = findViewById(R.id.ppg_data_button)
-        sweatDataButton = findViewById(R.id.sweat_data_button)
-        testDataButton = findViewById(R.id.test_data_button)
-        journalButton = findViewById(R.id.journal_button)
         buttonsContainer = findViewById(R.id.buttons_container)
 
-        // --- Setup Click Listeners ---
-        showGraphButton.setOnClickListener {
-            if (BleConnectionManager.gatt != null) {
-                val intent = Intent(this, GraphActivity::class.java)
-                startActivity(intent)
-            } else {
-                Toast.makeText(this, "Device is disconnected. Please wait.", Toast.LENGTH_SHORT).show()
-                buttonsContainer.visibility = View.GONE
-                startBleScan() // Try to reconnect
-            }
+        // Navigation buttons
+        findViewById<Button>(R.id.show_graph_button).setOnClickListener {
+            if (BleConnectionManager.gatt != null) startActivity(Intent(this, GraphActivity::class.java))
+            else startBleScan()
         }
+        findViewById<Button>(R.id.ppg_data_button).setOnClickListener { startActivity(Intent(this, PpgGraphActivity::class.java)) }
+        findViewById<Button>(R.id.sweat_data_button).setOnClickListener { startActivity(Intent(this, SweatGraphActivity::class.java)) }
+        findViewById<Button>(R.id.real_time_button).setOnClickListener { startActivity(Intent(this, RealTimeActivity::class.java)) }
+        findViewById<Button>(R.id.journal_button).setOnClickListener { startActivity(Intent(this, JournalActivity::class.java)) }
 
-        ppgDataButton.setOnClickListener {
-            val intent = Intent(this, PpgGraphActivity::class.java)
-            startActivity(intent)
-        }
-
-        sweatDataButton.setOnClickListener {
-            val intent = Intent(this, SweatGraphActivity::class.java)
-            startActivity(intent)
-        }
-
-        testDataButton.setOnClickListener { // Setup new button listener
-            val intent = Intent(this, TestGraphActivity::class.java)
-            startActivity(intent)
-        }
-
-        journalButton.setOnClickListener {
-            val intent = Intent(this, JournalActivity::class.java)
-            startActivity(intent)
-        }
-        // --- End of Setup ---
-
-
-        // Start the permission request flow. Everything else follows from here.
         requestPermissions()
-        Log.d(TAG, "onCreate: Permission check initiated.")
     }
 
     private fun requestPermissions() {
-        val permissionsToRequest = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            arrayOf(
-                Manifest.permission.BLUETOOTH_SCAN,
-                Manifest.permission.BLUETOOTH_CONNECT,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            )
+        val permissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            arrayOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.ACCESS_FINE_LOCATION)
         } else {
             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION)
         }
-
-        val allPermissionsGranted = permissionsToRequest.all {
-            ActivityCompat.checkSelfPermission(this, it) == PackageManager.PERMISSION_GRANTED
-        }
-
-        if (allPermissionsGranted) {
-            startAppInitialization()
-        } else {
-            requestPermissionLauncher.launch(permissionsToRequest)
-        }
+        requestPermissionLauncher.launch(permissions)
     }
 
     private fun startAppInitialization() {
-        Log.d(TAG, "Starting app initialization sequence.")
-
-        if (!packageManager.hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-            Toast.makeText(this, "BLE not supported on this device.", Toast.LENGTH_LONG).show()
-            finish()
-            return
-        }
-
-        if (!isPythonReady) {
-            thread(start = true) {
-                if (!Python.isStarted()) {
-                    Python.start(AndroidPlatform(this@MainActivity))
-                    Log.d(TAG, "Python started successfully.")
-                }
+        if (!Python.isStarted()) {
+            thread {
+                Python.start(AndroidPlatform(this))
                 isPythonReady = true
                 handler.post { startBleSetup() }
             }
         } else {
+            isPythonReady = true
             startBleSetup()
         }
     }
 
     private fun startBleSetup() {
-        if (!isPythonReady) {
-            Log.e(TAG, "Cannot start BLE setup until Python is ready.")
-            return
-        }
-
-        isBleReady = false
         if (!bluetoothAdapter.isEnabled) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S &&
-                ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                return
-            }
-            startActivity(enableBtIntent)
+            statusText.text = "Bluetooth is OFF. Please turn it ON."
         } else {
             isBleReady = true
             startBleScan()
-        }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        // This activity is now the primary listener for connection state
-        BleConnectionManager.connectionListener = this
-
-        // If we return and BLE is ready, start a scan
-        if (isPythonReady && bluetoothAdapter.isEnabled && !isBleReady && BleConnectionManager.gatt == null) {
-            isBleReady = true
-            startBleScan()
-        }
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // Only clear the listener if this activity is the one that set it
-        if (BleConnectionManager.connectionListener == this) {
-            BleConnectionManager.connectionListener = null
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun startBleScan() {
         if (scanning || !isBleReady) return
+
+        val scanner = bluetoothAdapter.bluetoothLeScanner
+        if (scanner == null) {
+            statusText.text = "Scanner Error. Is Bluetooth ON?"
+            return
+        }
+
         scanning = true
-        Log.i(TAG, "Starting BLE scan...")
-        handler.post { statusText.text = "Scanning for $DEVICE_NAME..." }
-        handler.postDelayed({
-            if (scanning) stopBleScan()
-        }, SCAN_PERIOD)
-        bluetoothAdapter.bluetoothLeScanner.startScan(leScanCallback)
+        statusText.text = "Searching for Device..."
+        Log.i(TAG, "--- Scan Started ---")
+
+        handler.postDelayed({ if (scanning) stopBleScan() }, SCAN_PERIOD)
+
+        val settings = ScanSettings.Builder()
+            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+            .build()
+
+        scanner.startScan(null, settings, leScanCallback)
     }
 
     @SuppressLint("MissingPermission")
     private fun stopBleScan() {
         if (!scanning) return
         scanning = false
-        Log.i(TAG, "Stopping BLE scan.")
-        bluetoothAdapter.bluetoothLeScanner.stopScan(leScanCallback)
+        bluetoothAdapter.bluetoothLeScanner?.stopScan(leScanCallback)
+        Log.i(TAG, "--- Scan Stopped ---")
     }
 
     private val leScanCallback: ScanCallback = object : ScanCallback() {
         @SuppressLint("MissingPermission")
         override fun onScanResult(callbackType: Int, result: ScanResult) {
-            if (result.device.name == DEVICE_NAME) {
-                Log.i(TAG, "Found device: ${result.device.name} @ ${result.device.address}")
+            val name = result.scanRecord?.deviceName ?: result.device.name
+            val address = result.device.address
+            val uuids = result.scanRecord?.serviceUuids
+
+            Log.d(TAG, "Discovered: Name=$name, Address=$address, UUIDs=$uuids")
+
+            val targetUuid = BleConnectionManager.SERVICE_UUID.toString()
+            val hasOurUuid = uuids?.any { it.uuid.toString().equals(targetUuid, ignoreCase = true) } ?: false
+
+            // Connect if Name matches OR if our Service UUID is present
+            if (name == DEVICE_NAME || name == "Test Device" || hasOurUuid) {
+                Log.i(TAG, ">>> TARGET FOUND! Connecting to $address")
                 stopBleScan()
                 connectToDevice(result.device)
             }
         }
+
         override fun onScanFailed(errorCode: Int) {
-            Log.e(TAG, "BLE Scan failed with code $errorCode")
-            scanning = false
+            Log.e(TAG, "Scan failed: $errorCode")
+            handler.post { statusText.text = "Scan Failed ($errorCode)" }
         }
     }
 
     @SuppressLint("MissingPermission")
     private fun connectToDevice(device: BluetoothDevice) {
-        Log.i(TAG, "Connecting to ${device.address}...")
         handler.post { statusText.text = "Connecting..." }
         BleConnectionManager.gatt = device.connectGatt(this, false, BleConnectionManager.gattCallback)
     }
 
     override fun onConnectionStateChanged(state: Int, status: Int) {
         handler.post {
-            when (state) {
-                BluetoothProfile.STATE_CONNECTED -> {
-                    if (status == BluetoothGatt.GATT_SUCCESS) {
-                        Log.i(TAG, "Device connected successfully. Discovering services...")
-                        statusText.text = "Device Connected!"
-                        buttonsContainer.visibility = View.VISIBLE // Show the button container
-
-                        // Discover services right after connection
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && ActivityCompat.checkSelfPermission(
-                                this, Manifest.permission.BLUETOOTH_CONNECT
-                            ) != PackageManager.PERMISSION_GRANTED
-                        ) {
-                            return@post
-                        }
-                        BleConnectionManager.gatt?.discoverServices()
-                    }
+            if (state == BluetoothProfile.STATE_CONNECTED) {
+                statusText.text = "Connected!"
+                buttonsContainer.visibility = View.VISIBLE
+                if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) == PackageManager.PERMISSION_GRANTED) {
+                    BleConnectionManager.gatt?.discoverServices()
                 }
-                BluetoothProfile.STATE_DISCONNECTED -> {
-                    Log.w(TAG, "Device disconnected.")
-                    statusText.text = "Disconnected. Scanning again..."
-                    buttonsContainer.visibility = View.GONE // Hide the button container
-                    isBleReady = true
-                    startBleScan()
-                }
+            } else if (state == BluetoothProfile.STATE_DISCONNECTED) {
+                statusText.text = "Disconnected. Scanning..."
+                buttonsContainer.visibility = View.GONE
+                startBleScan()
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        BleConnectionManager.connectionListener = this
     }
 
     @SuppressLint("MissingPermission")
