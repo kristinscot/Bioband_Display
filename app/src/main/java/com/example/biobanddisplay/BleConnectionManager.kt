@@ -30,12 +30,14 @@ object BleConnectionManager {
     var emgDataListener: BleDataListener? = null
     var ppgDataListener: BleDataListener? = null
     var sweatDataListener: BleDataListener? = null
-    var testDataListener: BleDataListener? = null // New listener for Test Data
 
     // GATT constants that must match your nRF52840 firmware
+    // Service UUID matches: D4, 86, 48, 24, 54, B3, 43, A1, BC, 20, 97, 8F, C3, 76, C2, 75
     val SERVICE_UUID: UUID = UUID.fromString("75c276c3-8f97-20bc-a143-b354244886d4")
-    // This is the single characteristic that sends both EMG and PPG data
-    val NOTIFY_CHARACTERISTIC_UUID: UUID = UUID.fromString("d3d46a35-4394-e9aa-5ae7-921120aad4ed")
+    
+    // Characteristic UUID updated to match: ED, AA, 20, 11, 92, E7, 43, 5A, AA, E9, 94, 43, 35, 6A, D4, D3
+    val NOTIFY_CHARACTERISTIC_UUID: UUID = UUID.fromString("d3d46a35-4394-e9aa-5a43-e7921120aaed")
+
     private val CCCD_UUID: UUID = UUID.fromString("00002902-0000-1000-8000-00805f9b34fb")
 
     // A single, shared callback that forwards events to the active listeners
@@ -86,11 +88,6 @@ object BleConnectionManager {
                     rawDataString.startsWith("SWEAT,") -> {
                         val sweatValue = rawDataString.removePrefix("SWEAT,")
                         sweatDataListener?.onDataReceived(sweatValue)
-                    }
-                    // Handle Test data
-                    rawDataString.startsWith("TEST,") -> {
-                        val testValue = rawDataString.removePrefix("TEST,")
-                        testDataListener?.onDataReceived(testValue)
                     }
                 }
             }
